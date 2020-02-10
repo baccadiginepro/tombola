@@ -1,0 +1,273 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			body {
+			    font-family: sans-serif;
+			    padding: 5vw;
+			}
+			h2 {
+			    text-align: center;
+			}
+			button {
+			    width: 100%;
+			    padding: 2vw;
+			    margin: 2vw 0;
+			    border: none;
+			}
+			input {
+			    vertical-align: middle;
+			}
+			#numero {
+			    width: 100%;
+			    text-align: center;
+			    margin: 10vw 0;
+			    font-size: 40vw;
+			    font-weight: bold;
+			    color: #A00;
+			}
+			#tabellone {
+			    position: absolute;
+			    width: 90%;
+			    bottom: 5vw;
+			    left: 5vw;
+			}
+			#tabellone table {
+			    width: 100%;
+			}
+			#tabellone table td {
+			    text-align: center;
+			    color: #ccc;
+			    font-weight: bold;
+			}
+			#tabellone table td.estratto {
+			    color: #000;
+			}
+		</style>
+		<script src="jquery-3.3.1.min.js"></script>
+		<script src="materialize.min.js"></script>
+		<script>
+			var msg;
+			var numeri = [];
+			var incorso = false;
+
+			function getRandomInt(min, max) {
+			    min = Math.ceil(min);
+			    max = Math.floor(max);
+			    return Math.floor(Math.random() * (max - min + 1)) + min;
+			}
+
+			function getNextNumber() {
+				var i = getRandomInt(0, numeri.length-1);
+				var n = numeri[i];
+				numeri.splice(i, 1);
+
+				console.log("Numero estratto: "+n);
+				console.log(numeri);
+
+				$('#numero').html(n);
+				$('#tabellone table td').filter(function() {
+					if ($(this).text() == n)
+						$(this).addClass('estratto');
+				});
+
+				if (n >= 60 && n <= 79) {
+					var sn = n.toString();
+					n += ', '+sn.charAt(0)+' '+sn.charAt(1);
+				}
+				return n;
+			}
+
+			function resetAll() {
+				incorso = false;
+				$('#speak').html('VIA');
+				numeri = [];
+				for (var i=1; i<=90; i++) {
+					numeri.push(i);
+				}
+				$('td').removeClass('estratto');
+				$('#numero').html("&nbsp;");
+				msg.text = "Primo estratto";
+			}
+
+			function init() {
+				for (var i=1; i<=90; i++) {
+					numeri.push(i);
+				}
+			  	if ('speechSynthesis' in window) {
+
+					msg.onend = function(e) {
+						setTimeout(function() {
+							if (numeri.length > 0) {
+								if (incorso) {
+									msg.text = getNextNumber();
+									speechSynthesis.cancel();
+									speechSynthesis.speak(msg);
+								}
+							} else {
+								resetAll();
+							}
+						}, parseInt($("#tempo").val()));
+						//console.log('Finished in ' + event.elapsedTime + ' seconds');
+					};
+
+				    $('#speak').click(function() {
+				    	if (!incorso) {
+				    		incorso = true;
+				    		$('#speak').html('PAUSA');
+				    		speechSynthesis.cancel();
+							speechSynthesis.speak(msg);
+						} else {
+							incorso = false;
+							$('#speak').html('VIA');
+							msg.text = 'Ultimo estratto '+msg.text;
+						}
+					});
+
+					$('#nuovo').click(resetAll);
+				}
+			}
+
+
+			$(window).on('load', function() {
+				msg = new SpeechSynthesisUtterance();
+				window.speechSynthesis.onvoiceschanged = function() {
+				    var voices = window.speechSynthesis.getVoices();
+				    msg.voice = voices[9];
+					msg.rate = 1;
+					msg.pitch = 1;
+					msg.volume = 1;
+					msg.text = "Primo estratto";
+					if (!incorso)
+						init();
+				};
+			});
+
+			
+		</script>
+	</head>
+	<body>
+		<h2>LA TOMBOLA</h2>
+		<div id="impostazioni">
+			<label for="tempo">Intervallo</label>
+			<input id="tempo" type="range" min="500" max="5000" step="500" value="2000" />
+		</div>
+		<button id="nuovo">NUOVO GIOCO</button>
+		<button id="speak">VIA</button>
+		<div id="numero">&nbsp;</div>
+		<div id="tabellone">
+			<table>
+				<tr>
+					<td>1</td>
+					<td>2</td>
+					<td>3</td>
+					<td>4</td>
+					<td>5</td>
+					<td>6</td>
+					<td>7</td>
+					<td>8</td>
+					<td>9</td>
+					<td>10</td>
+				</tr>
+				<tr>
+					<td>11</td>
+					<td>12</td>
+					<td>13</td>
+					<td>14</td>
+					<td>15</td>
+					<td>16</td>
+					<td>17</td>
+					<td>18</td>
+					<td>19</td>
+					<td>20</td>
+				</tr>
+				<tr>
+					<td>21</td>
+					<td>22</td>
+					<td>23</td>
+					<td>24</td>
+					<td>25</td>
+					<td>26</td>
+					<td>27</td>
+					<td>28</td>
+					<td>29</td>
+					<td>30</td>
+				</tr>
+				<tr>
+					<td>31</td>
+					<td>32</td>
+					<td>33</td>
+					<td>34</td>
+					<td>35</td>
+					<td>36</td>
+					<td>37</td>
+					<td>38</td>
+					<td>39</td>
+					<td>40</td>
+				</tr>
+				<tr>
+					<td>41</td>
+					<td>42</td>
+					<td>43</td>
+					<td>44</td>
+					<td>45</td>
+					<td>46</td>
+					<td>47</td>
+					<td>48</td>
+					<td>49</td>
+					<td>50</td>
+				</tr>
+				<tr>
+					<td>51</td>
+					<td>52</td>
+					<td>53</td>
+					<td>54</td>
+					<td>55</td>
+					<td>56</td>
+					<td>57</td>
+					<td>58</td>
+					<td>59</td>
+					<td>60</td>
+				</tr>
+				<tr>
+					<td>61</td>
+					<td>62</td>
+					<td>63</td>
+					<td>64</td>
+					<td>65</td>
+					<td>66</td>
+					<td>67</td>
+					<td>68</td>
+					<td>69</td>
+					<td>70</td>
+				</tr>
+				<tr>
+					<td>71</td>
+					<td>72</td>
+					<td>73</td>
+					<td>74</td>
+					<td>75</td>
+					<td>76</td>
+					<td>77</td>
+					<td>78</td>
+					<td>79</td>
+					<td>80</td>
+				</tr>
+				<tr>
+					<td>81</td>
+					<td>82</td>
+					<td>83</td>
+					<td>84</td>
+					<td>85</td>
+					<td>86</td>
+					<td>87</td>
+					<td>88</td>
+					<td>89</td>
+					<td>90</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>
+		
